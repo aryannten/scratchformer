@@ -1,0 +1,12 @@
+checkpoints/*.pt
+checkpoints/*.bin
+data/raw/tinyshakespeare.txt
+data/raw/custom_corpus.txt
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+.env
+.idea/
+.vscode/
+venv/
+.venv/
