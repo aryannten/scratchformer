@@ -3,6 +3,8 @@ import requests
 import torch
 from tokenizer import CharTokenizer
 
+import argparse
+
 def download_file(url, dest_path):
     """Download a file from a URL to a local destination path."""
     print(f"Downloading {url} to {dest_path}...")
@@ -14,26 +16,45 @@ def download_file(url, dest_path):
     print("Download complete!")
 
 def main():
+    parser = argparse.ArgumentParser(description="Prepare datasets for Scratchformer")
+    parser.add_argument("--dataset", type=str, default="shakespeare", choices=["shakespeare", "custom"],
+                        help="Choose which dataset to prepare ('shakespeare' or 'custom')")
+    args = parser.parse_args()
+
     # Paths
     raw_dir = os.path.join("data", "raw")
     prepared_dir = os.path.join("data", "prepared")
     
-    shakespeare_url = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
-    shakespeare_raw_path = os.path.join(raw_dir, "tinyshakespeare.txt")
-    
-    # 1. Download Tiny Shakespeare if not present
-    if not os.path.exists(shakespeare_raw_path):
-        download_file(shakespeare_url, shakespeare_raw_path)
+    if args.dataset == "shakespeare":
+        shakespeare_url = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
+        raw_path = os.path.join(raw_dir, "tinyshakespeare.txt")
+        
+        # 1. Download Tiny Shakespeare if not present
+        if not os.path.exists(raw_path):
+            download_file(shakespeare_url, raw_path)
+        
+        vocab_path = os.path.join(prepared_dir, "vocab.json")
+        train_dest = os.path.join(prepared_dir, "train.pt")
+        val_dest = os.path.join(prepared_dir, "val.pt")
+    else:
+        raw_path = os.path.join(raw_dir, "custom_corpus.txt")
+        
+        # 1. Ensure custom corpus exists
+        if not os.path.exists(raw_path):
+            raise FileNotFoundError(f"Custom corpus not found at {raw_path}. Run 'python fetch_custom_data.py' first!")
+            
+        vocab_path = os.path.join(prepared_dir, "custom_vocab.json")
+        train_dest = os.path.join(prepared_dir, "custom_train.pt")
+        val_dest = os.path.join(prepared_dir, "custom_val.pt")
     
     # 2. Read the raw text
-    with open(shakespeare_raw_path, 'r', encoding='utf-8') as f:
+    with open(raw_path, 'r', encoding='utf-8') as f:
         text = f.read()
     
-    print(f"Dataset loaded: {len(text):,} characters.")
+    print(f"Dataset '{args.dataset}' loaded: {len(text):,} characters.")
     
     # 3. Create tokenizer and save vocab
     tokenizer = CharTokenizer(text=text)
-    vocab_path = os.path.join(prepared_dir, "vocab.json")
     tokenizer.save(vocab_path)
     print(f"Vocabulary size: {tokenizer.vocab_size} unique characters. Vocab saved to {vocab_path}.")
     
@@ -52,9 +73,6 @@ def main():
     # 6. Convert to PyTorch tensors and save
     train_tensor = torch.tensor(train_ids, dtype=torch.long)
     val_tensor = torch.tensor(val_ids, dtype=torch.long)
-    
-    train_dest = os.path.join(prepared_dir, "train.pt")
-    val_dest = os.path.join(prepared_dir, "val.pt")
     
     torch.save(train_tensor, train_dest)
     torch.save(val_tensor, val_dest)
