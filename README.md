@@ -15,9 +15,9 @@ The model is first validated on the **Tiny Shakespeare** dataset (the standard n
 ## Architecture
 
 ```
-Input Text
-    │
-    ▼
+‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎Input Text
+   ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ │
+  ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎  ▼
 ┌──────────────────────┐
 │  Token Embedding     │  Maps each character to a learned vector
 │  + Position Embedding│  Adds positional information
