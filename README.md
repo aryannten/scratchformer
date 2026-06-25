@@ -2,8 +2,6 @@
 
 A character-level GPT language model built **entirely from scratch** using raw PyTorch tensor operations. No `transformers` library, no shortcuts — just pure understanding of the transformer architecture.
 
-🔗 **GitHub:** [github.com/aryannten/scratchformer](https://github.com/aryannten/scratchformer)
-
 ---
 
 ## What is this?
@@ -102,7 +100,7 @@ The raw CSV data is converted into natural-language sentences so the model learn
 - [x] **Day 2** — Single attention head with causal masking
 - [x] **Day 3** — Multi-head attention, feed-forward network, transformer block (pre-norm + residuals)
 - [x] **Dataset** — FIFA World Cup data pipeline (fetched early, Days 7–8 scope)
-- [ ] **Day 4** — Full model assembly (`Scratchformer` class + `GPTConfig`)
+- [x] **Day 4** — Full model assembly (`Scratchformer` class + `GPTConfig`)
 - [ ] **Day 5** — Colab training notebook + first training run
 - [ ] **Day 6** — Text generation (greedy, temperature, top-k sampling)
 - [ ] **Day 7–8** — Train on custom FIFA dataset, tune hyperparameters
@@ -121,7 +119,7 @@ scratchformer/
 ├── tokenizer.py              # Character-level tokenizer (encode/decode/save/load)
 ├── attention.py              # Single head + multi-head self-attention from scratch
 ├── block.py                  # FeedForward + TransformerBlock (pre-norm + residuals)
-├── model.py                  # Full Scratchformer model class (coming soon)
+├── model.py                  # Full Scratchformer model class + GPTConfig
 ├── generate.py               # Sampling strategies: greedy, temperature, top-k (coming soon)
 ├── train.ipynb               # Training notebook — runs on Colab T4 GPU (coming soon)
 ├── demo_app.py               # Gradio demo app (coming soon)
@@ -131,7 +129,8 @@ scratchformer/
 ├── tests/
 │   ├── test_tokenizer.py     # Tokenizer roundtrip tests
 │   ├── test_attention.py     # Head + MultiHeadAttention tests (10 tests)
-│   └── test_block.py         # FeedForward + TransformerBlock tests (11 tests)
+│   ├── test_block.py         # FeedForward + TransformerBlock tests (11 tests)
+│   └── test_model.py         # Full model + generation tests (14 tests)
 ├── requirements.txt
 ├── .gitignore
 └── README.md
