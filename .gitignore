@@ -1,5 +1,6 @@
 checkpoints/*.pt
 checkpoints/*.bin
+checkpoints/*.png
 data/raw/tinyshakespeare.txt
 data/raw/custom_corpus.txt
 __pycache__/

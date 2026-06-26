@@ -101,7 +101,7 @@ The raw CSV data is converted into natural-language sentences so the model learn
 - [x] **Day 3** — Multi-head attention, feed-forward network, transformer block (pre-norm + residuals)
 - [x] **Dataset** — FIFA World Cup data pipeline (fetched early, Days 7–8 scope)
 - [x] **Day 4** — Full model assembly (`Scratchformer` class + `GPTConfig`)
-- [ ] **Day 5** — Colab training notebook + first training run
+- [x] **Day 5** — Training script + Colab notebook + first training run
 - [ ] **Day 6** — Text generation (greedy, temperature, top-k sampling)
 - [ ] **Day 7–8** — Train on custom FIFA dataset, tune hyperparameters
 - [ ] **Day 9** — Gradio demo app
@@ -120,8 +120,9 @@ scratchformer/
 ├── attention.py              # Single head + multi-head self-attention from scratch
 ├── block.py                  # FeedForward + TransformerBlock (pre-norm + residuals)
 ├── model.py                  # Full Scratchformer model class + GPTConfig
+├── train.py                  # Standalone training script (CLI + importable)
+├── train.ipynb               # Training notebook — runs on Colab T4 GPU
 ├── generate.py               # Sampling strategies: greedy, temperature, top-k (coming soon)
-├── train.ipynb               # Training notebook — runs on Colab T4 GPU (coming soon)
 ├── demo_app.py               # Gradio demo app (coming soon)
 ├── prepare_data.py           # Dataset download, tokenization, and split script
 ├── fetch_custom_data.py      # FIFA World Cup data fetcher + NL sentence builder
@@ -178,6 +179,20 @@ python prepare_data.py
 python fetch_custom_data.py
 python prepare_data.py --dataset custom
 ```
+
+### Train
+
+**Local (CPU, for testing):**
+
+```bash
+python train.py --max-steps 50 --batch-size 8
+```
+
+**Colab (T4 GPU, for real training):**
+
+1. Upload `train.ipynb` to Google Colab
+2. Set runtime to **T4 GPU** (Runtime → Change runtime type)
+3. Run all cells — checkpoints are saved to Google Drive
 
 ### Run Tests
 

@@ -98,7 +98,66 @@ All **14 tests** passed, covering:
 
 ---
 
-## ⏳ Next Up: Day 5
-*Colab training notebook + first training run on Tiny Shakespeare*
+## ✅ Day 5: Training Infrastructure + First Run
+
+**Goal:** Build the training loop and run the first training on Tiny Shakespeare.
+
+**Key Concepts Learned:**
+
+### TrainConfig (dataclass)
+Mirrors `GPTConfig` but controls *how* we train rather than *what* the model looks like:
+- `max_steps=5000` — total gradient updates
+- `batch_size=64` — sequences per batch
+- `learning_rate=3e-4` — standard AdamW LR for small transformers
+- `weight_decay=0.1` — decoupled regularization
+- `grad_clip=1.0` — prevents exploding gradients
+- `warmup_steps=200` — linear LR warmup for stability
+- `eval_interval=250` — evaluate every N steps
+
+### Data Batching
+Each training step grabs random chunks from the tokenized tensor:
+- Pick `batch_size` random starting indices
+- Extract `block_size` consecutive tokens as input (`x`)
+- Target (`y`) is the same window **shifted by one** — the next character at each position
+- This is how the model learns next-token prediction
+
+### Learning Rate Schedule — Cosine with Warmup
+- **Warmup phase** (steps 0→200): Linear ramp from 0 to `3e-4`. Early random parameters need gentle updates.
+- **Cosine decay** (steps 200→5000): Smoothly decreases LR to `3e-5`. As the model approaches convergence, smaller updates fine-tune without overshooting.
+
+### AdamW Optimizer
+Standard choice for transformers. Key difference from plain Adam:
+- Weight decay is *decoupled* from the gradient update (better regularization)
+- Momentum + adaptive per-parameter learning rates handle different parameter scales
+
+### Gradient Clipping
+Caps the total gradient norm at 1.0. Without this, occasional large gradients (common in attention layers) can destabilize training by making huge parameter updates.
+
+### Evaluation Strategy
+- `estimate_loss()` averages loss over 50 random batches (not just one) for a stable estimate
+- Tracks both train and val loss to detect overfitting
+- Best val checkpoint is saved automatically
+
+### Checkpoint System
+Saves everything needed to resume training:
+- Model weights + optimizer state + current step + configs + loss history
+- Periodic saves every 500 steps (safety net for Colab disconnects)
+- Best val loss checkpoint + final checkpoint
+
+### Files Created
+- `train.py` — standalone training script with CLI args, importable by notebook
+- `train.ipynb` — Colab notebook with GPU setup, sanity checks, training, loss plotting, generation, and Drive backup
+
+### Local Sanity Check
+Ran 50 steps locally on CPU to verify the full pipeline:
+- Loss dropped from **4.26 → 3.69** (correct — random init is ~ln(65)=4.17)
+- Checkpoints saved and loaded successfully
+- Loss curve PNG generated
+- Generation produced output (gibberish at 50 steps is expected)
+
+---
+
+## ⏳ Next Up: Day 6
+*Full GPU training run on Colab + generation quality review. Debug, tune, and write `generate.py` with greedy/temperature/top-k sampling.*
 
 ---
