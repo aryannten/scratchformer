@@ -155,9 +155,40 @@ Ran 50 steps locally on CPU to verify the full pipeline:
 - Loss curve PNG generated
 - Generation produced output (gibberish at 50 steps is expected)
 
+### Colab T4 GPU Training — Results
+Trained for 5000 steps on a Tesla T4 GPU with batch_size=64, block_size=128:
+
+| Metric | Value |
+|--------|-------|
+| Final train loss | **1.5278** |
+| Final val loss | **1.7107** |
+| Parameters | ~824K (0.82M) |
+| GPU | Tesla T4 |
+
+**What the model learned:**
+- Real Shakespeare character names (CLARENCE, LEONTES, BENVOLIO, CLAUDIO, DUKE VINCENTIO, ISABEL)
+- Dialogue format with character names followed by colons
+- Mostly real English words and old-timey phrasing
+- Line breaks and verse structure
+
+**Sample generation (temperature=0.8):**
+```
+DUKE VINCENTIO:
+Who, my lady! what is in this one a man's ne'ers bishe.
+Would are not the fall'd cheeks is well our of
+The practor h
+```
+
+**Temperature effects observed:**
+- **0.3 (conservative):** More repetitive but structured — "The will the done are to his soul here"
+- **0.8 (balanced):** Best quality — real words, character names, coherent phrases
+- **1.2 (creative):** More garbled but inventive — "Desir, alk ragglievy and batmerh ramenions"
+
+✅ **Pipeline verified end-to-end.** The model is clearly learning English, Shakespeare's writing style, and the dialogue format. Any issues from here are data-related, not code bugs.
+
 ---
 
 ## ⏳ Next Up: Day 6
-*Full GPU training run on Colab + generation quality review. Debug, tune, and write `generate.py` with greedy/temperature/top-k sampling.*
+*Write standalone `generate.py` with greedy/temperature/top-k sampling. Load the trained checkpoint locally and verify generation quality.*
 
 ---
