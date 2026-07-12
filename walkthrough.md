@@ -188,7 +188,80 @@ The practor h
 
 ---
 
-## ⏳ Next Up: Day 6
-*Write standalone `generate.py` with greedy/temperature/top-k sampling. Load the trained checkpoint locally and verify generation quality.*
+## ✅ Day 6: Standalone Generation Script
+
+**Goal:** Write standalone `generate.py` with greedy/temperature/top-k sampling. Load the trained checkpoint and verify generation quality.
+
+**Accomplishments:**
+- Created `generate.py` — a full-featured inference script that loads any trained checkpoint and generates text.
+- Added unit tests for the generation module (`tests/test_generate.py`).
+
+### Sampling Strategies Implemented
+
+| Strategy | How it works | When to use |
+|----------|-------------|-------------|
+| **Greedy** | Always picks the most likely next token (`--greedy`) | Deterministic output, debugging |
+| **Temperature** | Scales logits before softmax (`--temperature X`) | Controlling creativity vs. coherence |
+| **Top-k** | Only considers the k most probable tokens (`--top-k X`) | Preventing unlikely/garbage tokens |
+
+### CLI Modes
+
+1. **Standard** — Generate once and exit:
+   ```bash
+   python generate.py --prompt "ROMEO:" --temperature 0.8 --max-tokens 200
+   ```
+
+2. **Greedy** — Deterministic decoding:
+   ```bash
+   python generate.py --greedy
+   ```
+
+3. **Compare** — Same prompt at 5 different temperatures side-by-side:
+   ```bash
+   python generate.py --compare --prompt "KING:" --seed 42
+   ```
+
+4. **Interactive** — REPL with live parameter changes:
+   ```bash
+   python generate.py --interactive
+   ```
+   Commands: `/temp X`, `/topk X`, `/greedy`, `/tokens X`, `/settings`, `/quit`
+
+5. **Multi-sample** — Generate N samples:
+   ```bash
+   python generate.py --prompt "ROMEO:" -n 3
+   ```
+
+### Temperature Comparison Results (seed=42, prompt="KING:")
+
+| Temperature | Behavior | Sample |
+|-------------|----------|--------|
+| Greedy | Repetitive loops | "What is the sent the see the stand..." |
+| 0.3 | Structured but limited | "The lie the shall be him of thy sent father..." |
+| 0.8 | Best balance | "The be back and and this with own meet..." |
+| 1.0 | More varied | "My not us up the all kit: Pomisporty..." |
+| 1.5 | Creative/garbled | "Cyill. --fork thy duky caers, I veline't..." |
+
+### Test Results
+
+All **9 tests** passed, covering:
+- `generate_text()` returns a string
+- Prompt is preserved in output
+- `max_new_tokens` controls output length exactly
+- Greedy mode is deterministic (3 identical runs)
+- Temperature affects output diversity
+- Empty prompt works (falls back to token-0 seed)
+- `top_k=1` is equivalent to greedy (deterministic)
+- Seed reproducibility (same seed → same output)
+- Integration test: loads real `best.pt` checkpoint and generates
+
+### Files Created
+- `generate.py` — standalone generation script with CLI, interactive mode, and comparison mode
+- `tests/test_generate.py` — 9 unit + integration tests
+
+---
+
+## ⏳ Next Up: Day 7
+*TBD — potential directions: attention visualization, model scaling experiments, or a web demo.*
 
 ---
