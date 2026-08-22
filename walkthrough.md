@@ -196,6 +196,25 @@ The practor h
 - Created `generate.py` — a full-featured inference script that loads any trained checkpoint and generates text.
 - Added unit tests for the generation module (`tests/test_generate.py`).
 
+**Key Concepts Learned:**
+
+### Checkpoint Loading for Inference
+- A checkpoint stores: model weights (`state_dict`), the `GPTConfig` used during training, the `TrainConfig` (for finding the vocab file), the training step, and loss history.
+- To reconstruct a model, we first create a `Scratchformer(config)` from the saved `GPTConfig`, then load the weights with `model.load_state_dict(checkpoint['model_state_dict'])`.
+- `torch.load(path, map_location=device)` lets us load a GPU-trained checkpoint directly onto CPU (and vice versa) without manual tensor moves.
+
+### Eval Mode vs Train Mode
+- `model.eval()` switches the model to evaluation mode. In our model this is mostly a signal (we don't use dropout yet), but it's critical practice — dropout and batch norm behave differently in eval mode.
+- Paired with `torch.no_grad()`, eval mode skips gradient tracking, saving memory and speeding up inference.
+
+### Three Sampling Strategies
+1. **Greedy decoding**: Always pick the token with the highest logit (`argmax`). Deterministic but repetitive — the model often gets stuck in loops like "the see the see the see..."
+2. **Temperature sampling**: Divide logits by `temperature` before softmax. This controls the "sharpness" of the probability distribution without changing which token has the highest probability.
+3. **Top-k sampling**: Zero out all logits except the k highest before softmax. Prevents the model from ever picking a very unlikely token, balancing diversity and quality.
+
+### Why Greedy Gets Stuck in Loops
+- When the model always picks the most probable next token, it can enter a fixed point: if "the" → "see" → "the" is the highest-probability chain, the model loops forever. Temperature and top-k add controlled randomness to break these cycles.
+
 ### Sampling Strategies Implemented
 
 | Strategy | How it works | When to use |
