@@ -94,21 +94,6 @@ The raw CSV data is converted into natural-language sentences so the model learn
 
 ---
 
-## Progress
-
-- [x] **Day 1** — Repo scaffolding, character-level tokenizer, data preparation pipeline
-- [x] **Day 2** — Single attention head with causal masking
-- [x] **Day 3** — Multi-head attention, feed-forward network, transformer block (pre-norm + residuals)
-- [x] **Dataset** — FIFA World Cup data pipeline (fetched early, Days 7–8 scope)
-- [x] **Day 4** — Full model assembly (`Scratchformer` class + `GPTConfig`)
-- [x] **Day 5** — Training script + Colab notebook + first training run
-- [ ] **Day 6** — Text generation (greedy, temperature, top-k sampling)
-- [ ] **Day 7–8** — Train on custom FIFA dataset, tune hyperparameters
-- [ ] **Day 9** — Gradio demo app
-- [ ] **Day 10** — Polish and final documentation
-
----
-
 ## Project Structure
 
 ```
