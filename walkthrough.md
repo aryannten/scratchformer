@@ -305,9 +305,24 @@ All **9 tests** passed, covering:
    - 5,000 steps with AdamW (`lr=3e-4`), `warmup_steps=300`, cosine decay to `3e-5`, `weight_decay=0.1`.
    - Diverse natural prompts covering tournament history, famous goals, legendary players, and tactical analysis.
 
+### Day 8 Training Results
+- **Final Train Loss:** 1.4608
+- **Final Val Loss:** 0.9832
+- The validation loss is now much lower and closer to train loss, indicating that dropout and the massive natural language dataset effectively eliminated the severe overfitting/memorization observed in Day 7. The generated narratives are now significantly more diverse, capturing the phrasing and structure of Wikipedia football articles.
+
 ---
 
-### ⏭️ Next Up: Day 9 — Gradio Interactive Web Demo
-*Build `demo_app.py` — an interactive web interface with temperature sliders, top-k controls, prompt suggestions, and live text generation.*
+## ✅ Day 9: Gradio Interactive Web Demo
 
----
+**Goal:** Build `demo_app.py` — an interactive web interface to easily generate text with our trained model.
+
+**Accomplishments:**
+- Created `demo_app.py` using **Gradio** to serve the Scratchformer model.
+- The web app automatically loads `checkpoints/best.pt` and the custom vocabulary.
+- Provides an intuitive UI with sliders for generation hyperparameters:
+  - **Max Tokens** (Length of generated text)
+  - **Temperature** (Creativity control)
+  - **Top-K** (Restricting the probability distribution)
+- Included sample prompts (e.g., "The 1970 FIFA World Cup in Mexico", "Diego Maradona scored a memorable") to demonstrate model capabilities directly in the browser.
+
+✅ **Scratchformer Project Complete!** The model went from an empty file to a fully trainable transformer architecture generating custom natural language text, complete with a web interface.
