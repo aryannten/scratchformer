@@ -1,14 +1,36 @@
-checkpoints/*.pt
-checkpoints/*.bin
-checkpoints/*.png
-data/raw/tinyshakespeare.txt
-data/raw/custom_corpus.txt
+# Model checkpoints & generated plots
+checkpoints/
+*.pt
+*.bin
+*.png
+
+# Datasets & raw corpora
+data/raw/
+data/processed/
+
+# Python & virtual environments
 __pycache__/
+*.py[cod]
+*$py.class
 .ipynb_checkpoints/
-*.pyc
 .env
-.idea/
-.vscode/
 venv/
 .venv/
+env/
+ENV/
+
+# IDE & Editor artifacts
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Local notes & assistant-specific files
 interview_prep.txt
+.claude/
+CLAUDE.md
+
+# Graphify knowledge graph outputs & caches
+graphify-out/
+.graphify*

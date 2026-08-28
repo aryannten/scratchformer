@@ -106,7 +106,8 @@ scratchformer/
 ├── block.py                  # FeedForward + TransformerBlock (pre-norm + residuals)
 ├── model.py                  # Full Scratchformer model class + GPTConfig
 ├── train.py                  # Standalone training script (CLI + importable)
-├── train.ipynb               # Training notebook — runs on Colab T4 GPU
+├── train.ipynb               # Training notebook — Shakespeare on Colab T4 GPU
+├── train_custom.ipynb        # Training notebook — FIFA World Cup on Colab T4 GPU
 ├── generate.py               # Sampling strategies: greedy, temperature, top-k (coming soon)
 ├── demo_app.py               # Gradio demo app (coming soon)
 ├── prepare_data.py           # Dataset download, tokenization, and split script

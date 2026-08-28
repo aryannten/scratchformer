@@ -280,7 +280,43 @@ All **9 tests** passed, covering:
 
 ---
 
-## ⏳ Next Up: Day 7
-*TBD — potential directions: attention visualization, model scaling experiments, or a web demo.*
+## ⏳ Day 7: Custom FIFA World Cup Training
+
+**Goal:** Train the model on our custom FIFA World Cup dataset (1930–2026) using the same architecture that was verified on Shakespeare.
+
+### What Changed from Shakespeare
+
+| Parameter | Shakespeare | FIFA | Why |
+|---|---|---|---|
+| `dataset` | `shakespeare` | `custom` | Different corpus |
+| `max_steps` | 5000 | 7500 | Slightly larger corpus (~1.2MB) + new domain |
+| `warmup_steps` | 200 | 300 | More diverse patterns, gentler warmup helps |
+| Vocab size | 65 chars | 79 chars | More digits, punctuation from stats/dates |
+| Drive dir | `scratchformer_checkpoints` | `scratchformer_checkpoints_fifa` | Keep separate from Shakespeare |
+
+### Files Created
+- `train_custom.ipynb` — Colab notebook for FIFA training, mirrors `train.ipynb` structure but with custom dataset settings, FIFA-specific generation prompts, and a side-by-side comparison section
+
+### How to Run
+1. Upload `train_custom.ipynb` to Google Colab
+2. Set runtime to **T4 GPU**
+3. Run all cells — the notebook will:
+   - Clone the repo and install deps
+   - Fetch FIFA data via `fetch_custom_data.py`
+   - Tokenize with `prepare_data.py --dataset custom`
+   - Train for 7500 steps (~7–10 min on T4)
+   - Generate FIFA-themed text with prompts like "The 2022 FIFA World Cup", "Brazil won the", etc.
+   - Save checkpoints to Google Drive
+
+### What to Expect
+- Initial loss: ~4.37 (ln(79)) — slightly higher than Shakespeare's 4.17 due to larger vocab
+- Final loss target: ~1.3–1.8 after 7500 steps
+- The FIFA dataset has more structured/repetitive patterns (dates, scores, "scored by") so the model should learn these templates relatively fast
+- Generation should show real country names, year-like patterns, and football vocabulary
+
+---
+
+### ⏭️ Next Up: Day 8
+*Iterate on custom training — compare hyperparameter variants, pick the best checkpoint for the demo.*
 
 ---
