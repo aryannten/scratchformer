@@ -472,6 +472,8 @@ if __name__ == "__main__":
                         help="Embedding dimension")
     parser.add_argument("--block-size", type=int, default=128,
                         help="Context window (block size)")
+    parser.add_argument("--dropout", type=float, default=0.0,
+                        help="Dropout rate (e.g. 0.1)")
     parser.add_argument("--resume", type=str, default=None,
                         help="Path to checkpoint to resume from")
     args = parser.parse_args()
@@ -481,6 +483,7 @@ if __name__ == "__main__":
         n_head=args.n_head,
         n_embd=args.n_embd,
         block_size=args.block_size,
+        dropout=args.dropout,
     )
 
     train_cfg = TrainConfig(

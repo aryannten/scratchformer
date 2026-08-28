@@ -46,6 +46,7 @@ class GPTConfig:
     n_layer: int = 4           # 4 transformer blocks stacked
     n_head: int = 4            # 4 attention heads per block
     n_embd: int = 128          # Each token is represented as a 128-dim vector
+    dropout: float = 0.0       # Dropout probability (e.g. 0.1 for regularization)
 
 
 # ── Full Model ─────────────────────────────────────────────────────
@@ -82,6 +83,7 @@ class Scratchformer(nn.Module):
         # Without this, the model would treat "hello" and "olleh" identically
         # because self-attention alone is permutation-invariant.
         self.position_embedding = nn.Embedding(config.block_size, config.n_embd)
+        self.drop = nn.Dropout(config.dropout)
 
         # ── Transformer blocks ─────────────────────────────────────
         # Stack N transformer blocks sequentially.
@@ -92,7 +94,8 @@ class Scratchformer(nn.Module):
             TransformerBlock(
                 embed_dim=config.n_embd,
                 num_heads=config.n_head,
-                block_size=config.block_size
+                block_size=config.block_size,
+                dropout=config.dropout
             )
             for _ in range(config.n_layer)
         ])
@@ -138,11 +141,8 @@ class Scratchformer(nn.Module):
         # torch.arange(T) creates [0, 1, 2, ..., T-1] on the correct device.
         pos_emb = self.position_embedding(torch.arange(T, device=device))  # (T, n_embd)
 
-        # Add token + position embeddings together.
-        # pos_emb is (T, n_embd) and tok_emb is (B, T, n_embd).
-        # Broadcasting handles the batch dimension automatically:
-        # each sample in the batch gets the same positional information added.
-        x = tok_emb + pos_emb                                        # (B, T, n_embd)
+        # Add token + position embeddings together and apply dropout
+        x = self.drop(tok_emb + pos_emb)                             # (B, T, n_embd)
 
         # ── Step 2: Transformer blocks ─────────────────────────────
         # Pass through all N stacked transformer blocks.

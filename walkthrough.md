@@ -280,43 +280,34 @@ All **9 tests** passed, covering:
 
 ---
 
-## ⏳ Day 7: Custom FIFA World Cup Training
+## ✅ Day 7 & 8: Custom FIFA World Cup Training & Iteration
 
-**Goal:** Train the model on our custom FIFA World Cup dataset (1930–2026) using the same architecture that was verified on Shakespeare.
+**Goal:** Train the model on the custom FIFA World Cup dataset, diagnose generation quality & overfitting, and overhaul the data and architecture for natural language generation.
 
-### What Changed from Shakespeare
+### Day 7 Diagnosis & Findings
+- Initial run trained on 7,500 steps of single-line CSV templates.
+- **Results:** Train loss **0.31** vs Val loss **2.68** (heavy overfitting/memorization).
+- **Issue:** ~85% of the corpus consisted of repetitive single-line templates (`"In the XXXX match... [player] scored a goal..."`). As a result, the model memorized that single sentence template and generated it repeatedly regardless of the prompt.
 
-| Parameter | Shakespeare | FIFA | Why |
-|---|---|---|---|
-| `dataset` | `shakespeare` | `custom` | Different corpus |
-| `max_steps` | 5000 | 7500 | Slightly larger corpus (~1.2MB) + new domain |
-| `warmup_steps` | 200 | 300 | More diverse patterns, gentler warmup helps |
-| Vocab size | 65 chars | 79 chars | More digits, punctuation from stats/dates |
-| Drive dir | `scratchformer_checkpoints` | `scratchformer_checkpoints_fifa` | Keep separate from Shakespeare |
+### Day 8 Improvements & Architecture Overhaul
 
-### Files Created
-- `train_custom.ipynb` — Colab notebook for FIFA training, mirrors `train.ipynb` structure but with custom dataset settings, FIFA-specific generation prompts, and a side-by-side comparison section
+1. **Natural Corpus 2.0 (`fetch_custom_data.py`):**
+   - Fetched **60 full Wikipedia articles** covering all World Cup tournaments (1930 to 2026), historic finals, and football legends (Pelé, Maradona, Messi, Zidane, Ronaldo, Cruyff, Mbappé, Beckenbauer, etc.).
+   - Synthesized CSV match events into **connected narrative match reports** with diverse phrasing, correct penalty shootout winner logic, and player name cleaning.
+   - Expanded corpus to **2.4M characters (~2.4 MB)** of natural, descriptive English football prose.
 
-### How to Run
-1. Upload `train_custom.ipynb` to Google Colab
-2. Set runtime to **T4 GPU**
-3. Run all cells — the notebook will:
-   - Clone the repo and install deps
-   - Fetch FIFA data via `fetch_custom_data.py`
-   - Tokenize with `prepare_data.py --dataset custom`
-   - Train for 7500 steps (~7–10 min on T4)
-   - Generate FIFA-themed text with prompts like "The 2022 FIFA World Cup", "Brazil won the", etc.
-   - Save checkpoints to Google Drive
+2. **Dropout Regularization (`dropout=0.1`):**
+   - Added dropout across all layers (`Head`, `MultiHeadAttention`, `FeedForward`, `TransformerBlock`, and `Scratchformer` token+position embeddings).
+   - Prevents co-adaptation and exact line memorization during training (`model.train()`).
+   - Automatically disabled during inference (`model.eval()`).
 
-### What to Expect
-- Initial loss: ~4.37 (ln(79)) — slightly higher than Shakespeare's 4.17 due to larger vocab
-- Final loss target: ~1.3–1.8 after 7500 steps
-- The FIFA dataset has more structured/repetitive patterns (dates, scores, "scored by") so the model should learn these templates relatively fast
-- Generation should show real country names, year-like patterns, and football vocabulary
+3. **Tuned Training Schedule (`train_custom.ipynb`):**
+   - 5,000 steps with AdamW (`lr=3e-4`), `warmup_steps=300`, cosine decay to `3e-5`, `weight_decay=0.1`.
+   - Diverse natural prompts covering tournament history, famous goals, legendary players, and tactical analysis.
 
 ---
 
-### ⏭️ Next Up: Day 8
-*Iterate on custom training — compare hyperparameter variants, pick the best checkpoint for the demo.*
+### ⏭️ Next Up: Day 9 — Gradio Interactive Web Demo
+*Build `demo_app.py` — an interactive web interface with temperature sliders, top-k controls, prompt suggestions, and live text generation.*
 
 ---

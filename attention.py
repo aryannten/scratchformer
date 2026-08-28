@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 class Head(nn.Module):
     """One head of self-attention."""
-    def __init__(self, embed_dim: int, head_dim: int, block_size: int):
+    def __init__(self, embed_dim: int, head_dim: int, block_size: int, dropout: float = 0.0):
         super().__init__()
         # Key, Query, Value linear projections (without bias as standard in GPT models)
         self.key   = nn.Linear(embed_dim, head_dim, bias=False)
@@ -17,6 +17,7 @@ class Head(nn.Module):
             'tril',
             torch.tril(torch.ones(block_size, block_size))
         )
+        self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
         # Input shape: (B, T, C) - Batch, Time (seq_len), Channels (embed_dim)
@@ -34,6 +35,7 @@ class Head(nn.Module):
         # so that they map to 0 after softmax
         wei = wei.masked_fill(self.tril[:T, :T] == 0, float('-inf'))
         wei = F.softmax(wei, dim=-1)
+        wei = self.dropout(wei)
 
         # Weighted sum of values
         out = wei @ v  # (B, T, head_dim)
@@ -42,19 +44,20 @@ class Head(nn.Module):
 
 class MultiHeadAttention(nn.Module):
     """Multiple heads of self-attention in parallel."""
-    def __init__(self, embed_dim: int, num_heads: int, block_size: int):
+    def __init__(self, embed_dim: int, num_heads: int, block_size: int, dropout: float = 0.0):
         super().__init__()
         assert embed_dim % num_heads == 0, f"embed_dim {embed_dim} must be divisible by num_heads {num_heads}"
         head_dim = embed_dim // num_heads
         self.heads = nn.ModuleList([
-            Head(embed_dim, head_dim, block_size) for _ in range(num_heads)
+            Head(embed_dim, head_dim, block_size, dropout=dropout) for _ in range(num_heads)
         ])
         self.proj = nn.Linear(embed_dim, embed_dim)  # output projection
+        self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
         # Concatenate outputs from all attention heads along the channel dimension
         out = torch.cat([h(x) for h in self.heads], dim=-1)
-        # Apply output projection
-        out = self.proj(out)
+        # Apply output projection and dropout
+        out = self.dropout(self.proj(out))
         return out
 
